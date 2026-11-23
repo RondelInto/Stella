@@ -6,6 +6,7 @@ use App\Models\InventoryItem;
 use App\Models\InventoryTransaction;
 use App\Models\Location;
 use App\Models\ProductionRecord;
+use App\Models\SopRecord;
 use App\Models\StockTransfer;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -73,6 +74,17 @@ class DashboardController extends Controller
             $stats['production_today'] = ProductionRecord::where('status', ProductionRecord::STATUS_COMPLETED)
                 ->whereDate('production_date', today())
                 ->count();
+        }
+
+        if ($user->can('view-sops')) {
+            $visible = SopRecord::query()->visibleTo($user);
+
+            $stats['sops'] = [
+                'count' => (clone $visible)->count(),
+                // For staff: procedures added or changed in the last 7 days (so they notice updates).
+                'recent' => (clone $visible)->where('updated_at', '>=', now()->subDays(7))
+                    ->latest('updated_at')->take(5)->get(['id', 'sop_code', 'title', 'version_no', 'updated_at']),
+            ];
         }
 
         return view('dashboard', compact('stats'));

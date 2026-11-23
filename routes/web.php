@@ -5,6 +5,7 @@ use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryItemImportController;
 use App\Http\Controllers\InventoryTransactionController;
+use App\Http\Controllers\SopController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\StockLevelController;
 use App\Http\Controllers\StockTransferController;
@@ -143,6 +144,28 @@ Route::middleware(['auth', 'can:view-production'])->group(function () {
     Route::get('/production', [ProductionRecordController::class, 'index'])->name('production.index');
     Route::get('/production/planning', [ProductionPlanningController::class, 'index'])->name('production.planning');
     Route::get('/production/{record}', [ProductionRecordController::class, 'show'])->name('production.show');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Standard Operating Procedures
+|--------------------------------------------------------------------------
+| Manage: 'manage-sops'. View: 'view-sops' + SopRecordPolicy (role, status, effective date).
+*/
+Route::middleware(['auth', 'can:manage-sops'])->group(function () {
+    Route::get('/sops/create', [SopController::class, 'create'])->name('sops.create');
+    Route::post('/sops', [SopController::class, 'store'])->name('sops.store');
+    Route::post('/sops/preview', [SopController::class, 'preview'])->name('sops.preview');
+    Route::get('/sops/{sop}/edit', [SopController::class, 'edit'])->name('sops.edit');
+    Route::put('/sops/{sop}', [SopController::class, 'update'])->name('sops.update');
+    Route::patch('/sops/{sop}/status', [SopController::class, 'updateStatus'])->name('sops.status');
+    Route::get('/sops/{sop}/versions/{version}', [SopController::class, 'showVersion'])->name('sops.versions.show');
+});
+
+Route::middleware(['auth', 'can:view-sops'])->group(function () {
+    Route::get('/sops', [SopController::class, 'index'])->name('sops.index');
+    Route::get('/sops/{sop}', [SopController::class, 'show'])->name('sops.show');
+    Route::get('/sops/{sop}/print', [SopController::class, 'print'])->name('sops.print');
 });
 
 // Management (Admin): branches and commissary

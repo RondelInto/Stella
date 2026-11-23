@@ -104,6 +104,37 @@
         </div>
     @endisset
 
+    @isset($stats['sops'])
+        <h3 class="h6 text-uppercase text-muted small">{{ __('Procedures') }}</h3>
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <a href="{{ route('sops.index') }}" class="card border-0 shadow-sm text-decoration-none h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ __('SOPs Available to You') }}</div>
+                        <div class="fs-3 fw-semibold text-body">{{ $stats['sops']['count'] }}</div>
+                    </div>
+                </a>
+            </div>
+            @if ($stats['sops']['recent']->isNotEmpty())
+                <div class="col-12 col-lg-9">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small mb-1">{{ __('New or updated in the last 7 days') }}</div>
+                            <ul class="list-unstyled mb-0 small">
+                                @foreach ($stats['sops']['recent'] as $recentSop)
+                                    <li>
+                                        <a href="{{ route('sops.show', $recentSop) }}">{{ $recentSop->title }}</a>
+                                        <span class="text-muted">· v{{ $recentSop->version_no }} · {{ $recentSop->updated_at->format('M d') }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endisset
+
     @isset($stats['employees'])
         <h3 class="h6 text-uppercase text-muted small">{{ __('Administration') }}</h3>
         <div class="row g-3">

@@ -79,6 +79,12 @@
                         {{ __('Production History') }}
                     </x-nav-link>
                 @endcan
+                @can('view-sops')
+                    <div class="sidebar-heading">{{ __('Procedures') }}</div>
+                    <x-nav-link :href="route('sops.index')" :active="request()->routeIs('sops.*')" icon="journal-text">
+                        {{ __('SOP Library') }}
+                    </x-nav-link>
+                @endcan
                 @can('manage-inventory-items')
                     <div class="sidebar-heading">{{ __('Catalog') }}</div>
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" icon="basket">

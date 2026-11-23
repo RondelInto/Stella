@@ -88,6 +88,12 @@ body {
     }
 }
 
+/* ---- SOP procedure text (rendered Markdown) ---- */
+.sop-content { line-height: 1.65; }
+.sop-content h1, .sop-content h2, .sop-content h3 { font-size: 1.15rem; margin-top: 1.25rem; }
+.sop-content ol li, .sop-content ul li { margin-bottom: .35rem; }
+.sop-content > :last-child { margin-bottom: 0; }
+
 /* ---- Guest (login) pages ---- */
 .auth-card {
     max-width: 420px;
