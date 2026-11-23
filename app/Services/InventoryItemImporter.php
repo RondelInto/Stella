@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Requests\InventoryItemRequest;
 use App\Models\InventoryCategory;
 use App\Models\InventoryItem;
+use App\Support\CsvReader;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -101,61 +102,20 @@ class InventoryItemImporter
 
     /**
      * Read and normalize the CSV. Returns [rowNumber => row] or ['error' => message].
-     * Row numbers match what users see in Excel (header = row 1).
      */
     private function readCsv(string $path): array
     {
-        $handle = fopen($path, 'r');
-        if (! $handle) {
-            return ['error' => 'The file could not be read.'];
+        $csv = CsvReader::read($path, self::HEADERS, self::MAX_ROWS);
+        if (isset($csv['error'])) {
+            return $csv;
         }
 
-        try {
-            $header = fgetcsv($handle);
-            if (! $header) {
-                return ['error' => 'The file is empty.'];
-            }
+        // Same normalization as the Add Item form.
+        return array_map(function (array $row) {
+            $row['item_code'] = Str::upper($row['item_code']);
+            $row['item_type'] = Str::lower($row['item_type']);
 
-            // Remove the invisible BOM that Excel adds to "CSV UTF-8" files.
-            $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $header[0]);
-            $header = array_map(fn ($h) => Str::lower(trim((string) $h)), $header);
-
-            if ($header !== self::HEADERS) {
-                return ['error' => 'The column headers do not match the template. Expected: '.implode(', ', self::HEADERS).'.'];
-            }
-
-            $rows = [];
-            $rowNumber = 1;
-
-            while (($values = fgetcsv($handle)) !== false) {
-                $rowNumber++;
-
-                // Skip completely blank lines.
-                if (count(array_filter($values, fn ($v) => trim((string) $v) !== '')) === 0) {
-                    continue;
-                }
-
-                if (count($rows) >= self::MAX_ROWS) {
-                    return ['error' => 'The file has more than '.self::MAX_ROWS.' rows. Split it into smaller files.'];
-                }
-
-                $values = array_pad(array_slice($values, 0, count(self::HEADERS)), count(self::HEADERS), '');
-                $row = array_combine(self::HEADERS, array_map(fn ($v) => trim((string) $v), $values));
-
-                // Same normalization as the Add Item form.
-                $row['item_code'] = Str::upper($row['item_code']);
-                $row['item_type'] = Str::lower($row['item_type']);
-
-                $rows[$rowNumber] = $row;
-            }
-
-            if (! $rows) {
-                return ['error' => 'The file has no item rows below the header.'];
-            }
-
-            return $rows;
-        } finally {
-            fclose($handle);
-        }
+            return $row;
+        }, $csv['rows']);
     }
 }

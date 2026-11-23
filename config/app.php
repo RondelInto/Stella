@@ -65,7 +65,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Stella's Cuisine operates in the Philippines (UTC+8). POS export times are local times,
+    // and "today" must change at midnight Manila time, not 8:00 AM.
+    'timezone' => env('APP_TIMEZONE', 'Asia/Manila'),
 
     /*
     |--------------------------------------------------------------------------

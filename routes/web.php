@@ -16,6 +16,7 @@ use App\Http\Controllers\ProductionRecordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SalesImportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -167,6 +168,23 @@ Route::middleware(['auth', 'can:view-sops'])->group(function () {
     Route::get('/sops', [SopController::class, 'index'])->name('sops.index');
     Route::get('/sops/{sop}', [SopController::class, 'show'])->name('sops.show');
     Route::get('/sops/{sop}/print', [SopController::class, 'print'])->name('sops.print');
+});
+
+/*
+|--------------------------------------------------------------------------
+| POS sales import (module 7)
+|--------------------------------------------------------------------------
+| Reads files EXPORTED from each location's POS. Never connects to the POS. Management only.
+*/
+Route::middleware(['auth', 'can:import-pos-sales'])->prefix('sales-imports')->name('sales-imports.')->group(function () {
+    Route::get('/', [SalesImportController::class, 'index'])->name('index');
+    Route::get('/create', [SalesImportController::class, 'create'])->name('create');
+    Route::post('/', [SalesImportController::class, 'store'])->name('store');
+    Route::get('/template', [SalesImportController::class, 'template'])->name('template');
+    Route::get('/unmatched', [SalesImportController::class, 'unmatched'])->name('unmatched');
+    Route::post('/unmatched/link', [SalesImportController::class, 'link'])->name('link');
+    Route::get('/{batch}', [SalesImportController::class, 'show'])->name('show');
+    Route::delete('/{batch}', [SalesImportController::class, 'destroy'])->name('destroy');
 });
 
 /*

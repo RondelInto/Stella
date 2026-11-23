@@ -13,6 +13,8 @@ class ImportedPosSale extends Model
     protected $fillable = [
         'sales_import_batch_id',
         'product_id',
+        'pos_product_code',
+        'pos_product_name',
         'pos_receipt_no',
         'sale_datetime',
         'quantity_sold',

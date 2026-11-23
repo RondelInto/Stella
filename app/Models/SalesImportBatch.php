@@ -51,4 +51,10 @@ class SalesImportBatch extends Model
     {
         return $this->belongsToMany(AnalysisRun::class, 'analysis_run_batch')->withTimestamps();
     }
+
+    /** Decision PI7: a batch can be deleted only while no analysis run has used it. */
+    public function canBeDeleted(): bool
+    {
+        return ! $this->analysisRuns()->exists();
+    }
 }
