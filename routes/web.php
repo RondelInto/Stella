@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductionPlanningController;
 use App\Http\Controllers\ProductionRecordController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -166,6 +167,21 @@ Route::middleware(['auth', 'can:view-sops'])->group(function () {
     Route::get('/sops', [SopController::class, 'index'])->name('sops.index');
     Route::get('/sops/{sop}', [SopController::class, 'show'])->name('sops.show');
     Route::get('/sops/{sop}/print', [SopController::class, 'print'])->name('sops.print');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Reports
+|--------------------------------------------------------------------------
+| 'view-branch-reports' = Management + Branch Managers. The controller limits Branch Managers
+| to their own branch and shows peso values only to Management ('view-all-reports').
+*/
+Route::middleware(['auth', 'can:view-branch-reports'])->prefix('reports')->name('reports.')->group(function () {
+    Route::get('/', [ReportController::class, 'index'])->name('index');
+    Route::get('/inventory-movement', [ReportController::class, 'inventoryMovement'])->name('inventory-movement');
+    Route::get('/discrepancies', [ReportController::class, 'discrepancies'])->name('discrepancies');
+    Route::get('/production', [ReportController::class, 'production'])->name('production');
+    Route::get('/transfers', [ReportController::class, 'transfers'])->name('transfers');
 });
 
 // Management (Admin): branches and commissary
