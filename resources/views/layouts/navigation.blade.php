@@ -65,7 +65,25 @@
                         {{ __('Stock Transfers') }}
                     </x-nav-link>
                 @endcan
+                @can('view-production')
+                    <div class="sidebar-heading">{{ __('Production') }}</div>
+                    <x-nav-link :href="route('production.planning')" :active="request()->routeIs('production.planning')" icon="clipboard-data">
+                        {{ __('Planning') }}
+                    </x-nav-link>
+                    @can('record-production')
+                        <x-nav-link :href="route('production.create')" :active="request()->routeIs('production.create')" icon="fire">
+                            {{ __('Record Production') }}
+                        </x-nav-link>
+                    @endcan
+                    <x-nav-link :href="route('production.index')" :active="request()->routeIs('production.index', 'production.show')" icon="clock-history">
+                        {{ __('Production History') }}
+                    </x-nav-link>
+                @endcan
                 @can('manage-inventory-items')
+                    <div class="sidebar-heading">{{ __('Catalog') }}</div>
+                    <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" icon="basket">
+                        {{ __('Products') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('inventory-categories.index')" :active="request()->routeIs('inventory-categories.*')" icon="tags">
                         {{ __('Categories') }}
                     </x-nav-link>

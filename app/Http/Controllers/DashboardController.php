@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use App\Models\InventoryTransaction;
 use App\Models\Location;
+use App\Models\ProductionRecord;
 use App\Models\StockTransfer;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -66,6 +67,12 @@ class DashboardController extends Controller
                         ->where('status', StockTransfer::STATUS_RELEASED)->count()
                     : null,
             ];
+        }
+
+        if ($user->can('view-production')) {
+            $stats['production_today'] = ProductionRecord::where('status', ProductionRecord::STATUS_COMPLETED)
+                ->whereDate('production_date', today())
+                ->count();
         }
 
         return view('dashboard', compact('stats'));

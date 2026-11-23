@@ -9,6 +9,9 @@ use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\StockLevelController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductionPlanningController;
+use App\Http\Controllers\ProductionRecordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -118,6 +121,28 @@ Route::middleware(['auth', 'can:view-stock-transfers'])->group(function () {
     Route::get('/transfers', [StockTransferController::class, 'index'])->name('stock-transfers.index');
     Route::get('/transfers/{transfer}', [StockTransferController::class, 'show'])->name('stock-transfers.show');
     Route::get('/transfers/{transfer}/print', [StockTransferController::class, 'print'])->name('stock-transfers.print');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Food production
+|--------------------------------------------------------------------------
+*/
+// Sellable products (Management, same permission as the item list).
+Route::middleware(['auth', 'can:manage-inventory-items'])->group(function () {
+    Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+    Route::patch('/products/{product}/status', [ProductController::class, 'updateStatus'])->name('products.status');
+});
+
+Route::middleware(['auth', 'can:record-production'])->group(function () {
+    Route::get('/production/create', [ProductionRecordController::class, 'create'])->name('production.create');
+    Route::post('/production', [ProductionRecordController::class, 'store'])->name('production.store');
+});
+
+Route::middleware(['auth', 'can:view-production'])->group(function () {
+    Route::get('/production', [ProductionRecordController::class, 'index'])->name('production.index');
+    Route::get('/production/planning', [ProductionPlanningController::class, 'index'])->name('production.planning');
+    Route::get('/production/{record}', [ProductionRecordController::class, 'show'])->name('production.show');
 });
 
 // Management (Admin): branches and commissary

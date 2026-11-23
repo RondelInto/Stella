@@ -81,6 +81,29 @@
         </div>
     @endisset
 
+    @isset($stats['production_today'])
+        <h3 class="h6 text-uppercase text-muted small">{{ __('Production') }}</h3>
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <a href="{{ route('production.index', ['from' => today()->toDateString(), 'to' => today()->toDateString()]) }}"
+                   class="card border-0 shadow-sm text-decoration-none h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ __('Batches Recorded Today') }}</div>
+                        <div class="fs-3 fw-semibold text-body">{{ $stats['production_today'] }}</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a href="{{ route('production.planning') }}" class="card border-0 shadow-sm text-decoration-none h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ __('Production Planning') }}</div>
+                        <div class="fs-6 text-body mt-2"><i class="bi bi-clipboard-data me-1"></i>{{ __('See remaining stock') }}</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    @endisset
+
     @isset($stats['employees'])
         <h3 class="h6 text-uppercase text-muted small">{{ __('Administration') }}</h3>
         <div class="row g-3">
