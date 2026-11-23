@@ -1,0 +1,10 @@
+item_code,name,category,item_type,unit_of_measure,unit_cost,reorder_level
+SMP-ING-001,SAMPLE Glutinous Rice Flour,Kakanin,ingredient,kg,0.00,10
+SMP-ING-002,SAMPLE Coconut Milk,Kakanin,ingredient,liter,0.00,5
+SMP-ING-003,SAMPLE Brown Sugar,Kakanin,ingredient,kg,0.00,5
+SMP-ING-004,SAMPLE Rice Noodles,Cooked Food,ingredient,kg,0.00,8
+SMP-ING-005,SAMPLE Ground Pork,Cooked Food,ingredient,kg,0.00,5
+SMP-PRP-001,SAMPLE Palabok Sauce (batch),Cooked Food,in_preparation,liter,0.00,3
+SMP-FIN-001,SAMPLE Palabok Bilao,Cooked Food,finished_product,bilao,0.00,2
+SMP-FIN-002,SAMPLE Kutsinta Tray,Kakanin,finished_product,tray,0.00,2
+SMP-FIN-003,SAMPLE Bottled Water,Beverages,finished_product,bottle,0.00,24

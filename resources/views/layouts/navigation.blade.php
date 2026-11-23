@@ -40,6 +40,18 @@
 
                 {{-- Phase 4 module links go here (each wrapped in @can) --}}
 
+                @can('view-inventory')
+                    <div class="sidebar-heading">{{ __('Inventory') }}</div>
+                    <x-nav-link :href="route('inventory-items.index')" :active="request()->routeIs('inventory-items.*')" icon="box-seam">
+                        {{ __('Items') }}
+                    </x-nav-link>
+                @endcan
+                @can('manage-inventory-items')
+                    <x-nav-link :href="route('inventory-categories.index')" :active="request()->routeIs('inventory-categories.*')" icon="tags">
+                        {{ __('Categories') }}
+                    </x-nav-link>
+                @endcan
+
                 @can('manage-users')
                     <div class="sidebar-heading">{{ __('Administration') }}</div>
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" icon="people">

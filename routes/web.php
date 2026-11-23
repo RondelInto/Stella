@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryCategoryController;
+use App\Http\Controllers\InventoryItemController;
+use App\Http\Controllers\InventoryItemImportController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -32,6 +35,34 @@ Route::middleware(['auth', 'can:manage-users'])->group(function () {
     Route::put('/users/{user}/password', [UserController::class, 'resetPassword'])->name('users.password');
 
     Route::resource('roles', RoleController::class)->only(['index', 'edit', 'update']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Inventory
+|--------------------------------------------------------------------------
+| Item list/detail: anyone who can view inventory. Add/edit: Management only.
+| NOTE: the 'manage' routes are registered first so '/inventory/items/create'
+| is not mistaken for an item ID by the 'show' route.
+*/
+Route::middleware(['auth', 'can:manage-inventory-items'])->prefix('inventory')->group(function () {
+    Route::resource('categories', InventoryCategoryController::class)
+        ->except(['show'])
+        ->names('inventory-categories');
+
+    Route::get('/items/import', [InventoryItemImportController::class, 'create'])->name('inventory-items.import');
+    Route::post('/items/import', [InventoryItemImportController::class, 'store'])->name('inventory-items.import.store');
+    Route::get('/items/import/template', [InventoryItemImportController::class, 'template'])->name('inventory-items.import.template');
+
+    Route::resource('items', InventoryItemController::class)
+        ->only(['create', 'store', 'edit', 'update'])
+        ->names('inventory-items');
+    Route::patch('/items/{item}/status', [InventoryItemController::class, 'updateStatus'])->name('inventory-items.status');
+});
+
+Route::middleware(['auth', 'can:view-inventory'])->prefix('inventory')->group(function () {
+    Route::get('/items', [InventoryItemController::class, 'index'])->name('inventory-items.index');
+    Route::get('/items/{item}', [InventoryItemController::class, 'show'])->name('inventory-items.show');
 });
 
 // Management (Admin): branches and commissary

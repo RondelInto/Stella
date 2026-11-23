@@ -1,0 +1,10 @@
+item_code,name,category,item_type,unit_of_measure,unit_cost,reorder_level
+SMP-OK-001,SAMPLE Valid Row,Kakanin,ingredient,kg,0.00,1
+SMP-OK-001,SAMPLE Duplicate Code In File,Kakanin,ingredient,kg,0.00,1
+SMP BAD 002,SAMPLE Code With Spaces,Kakanin,ingredient,kg,0.00,1
+SMP-ERR-003,,Kakanin,ingredient,kg,0.00,1
+SMP-ERR-004,SAMPLE Unknown Category,Desserts,ingredient,kg,0.00,1
+SMP-ERR-005,SAMPLE Unknown Type,Kakanin,raw,kg,0.00,1
+SMP-ERR-006,SAMPLE Negative Cost,Kakanin,ingredient,kg,-5,1
+SMP-ERR-007,SAMPLE Text In Number,Kakanin,ingredient,kg,fifty,1
+SMP-ERR-008,SAMPLE Missing Unit,Kakanin,ingredient,,0.00,1
