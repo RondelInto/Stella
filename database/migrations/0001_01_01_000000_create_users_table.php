@@ -13,10 +13,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            // Assigned branch/commissary. NULL for Management, who oversee all locations.
+            $table->foreignId('location_id')->nullable()->constrained()->restrictOnDelete();
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
+            $table->string('username', 50)->unique();          // used for login
+            $table->string('email')->nullable()->unique();     // optional (not all staff have email)
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password');                        // hashed automatically by Laravel
+            $table->string('contact_no', 30)->nullable();
+            // Users are deactivated, never deleted, so the audit trail stays intact.
+            $table->enum('account_status', ['active', 'inactive'])->default('active');
             $table->rememberToken();
             $table->timestamps();
         });

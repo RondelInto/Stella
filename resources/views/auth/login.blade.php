@@ -8,10 +8,10 @@
         @csrf
 
         <div class="mb-3">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" type="email" name="email" :value="old('email')"
-                          :invalid="$errors->has('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" />
+            <x-input-label for="username" :value="__('Username')" />
+            <x-text-input id="username" type="text" name="username" :value="old('username')"
+                          :invalid="$errors->has('username')" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('username')" />
         </div>
 
         <div class="mb-3">

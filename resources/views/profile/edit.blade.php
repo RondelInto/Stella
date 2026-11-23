@@ -18,13 +18,5 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-12 col-xl-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
     </div>
 </x-app-layout>

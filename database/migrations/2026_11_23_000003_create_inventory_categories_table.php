@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Inventory categories, e.g. Beverages, Cooked Food, Kakanin.
+ */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('inventory_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 100)->unique();
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('inventory_categories');
+    }
+};
