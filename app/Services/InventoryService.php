@@ -83,6 +83,43 @@ class InventoryService
         });
     }
 
+    /**
+     * Stock count: set the stock to the physically counted quantity.
+     *
+     * The system quantity is read WHILE THE ROW IS LOCKED, so it is the exact quantity at the
+     * moment the count is completed. If counted != system, a count_adjustment is recorded.
+     *
+     * @return array{system: string, variance: string}  e.g. ['system' => '10.000', 'variance' => '-1.500']
+     */
+    public function adjustToCount(
+        InventoryItem $item,
+        Location $location,
+        float|int|string $countedQuantity,
+        User $user,
+        int $stockCountId,
+        ?string $remarks = null,
+    ): array {
+        $counted = self::toUnits($countedQuantity);
+
+        if ($counted < 0) {
+            throw new InvalidArgumentException('A counted quantity cannot be negative.');
+        }
+
+        return DB::transaction(function () use ($item, $location, $counted, $user, $stockCountId, $remarks) {
+            $system = self::toUnits($this->lockStockRow($item, $location)->quantity_on_hand);
+            $variance = $counted - $system;
+
+            if ($variance !== 0) {
+                $this->record(
+                    $item, $location, InventoryTransaction::COUNT_ADJUSTMENT, self::fromUnits($variance), $user,
+                    remarks: $remarks, links: ['stock_count_id' => $stockCountId],
+                );
+            }
+
+            return ['system' => self::fromUnits($system), 'variance' => self::fromUnits($variance)];
+        });
+    }
+
     /** Current quantity on hand (0 if the item has never been stocked at this location). */
     public function quantityOnHand(InventoryItem $item, Location $location): string
     {

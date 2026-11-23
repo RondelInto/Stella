@@ -14,13 +14,22 @@ class StockCount extends Model
     public const STATUS_DRAFT = 'draft';
     public const STATUS_COMPLETED = 'completed';
 
-    protected $fillable = ['location_id', 'counted_by', 'count_date', 'status', 'remarks'];
+    /** Maximum items in one count (PHP accepts ~1,000 form fields; larger counts are split by category). */
+    public const MAX_ITEMS = 300;
+
+    protected $fillable = ['location_id', 'counted_by', 'count_date', 'status', 'completed_at', 'remarks'];
 
     protected function casts(): array
     {
         return [
             'count_date' => 'date',
+            'completed_at' => 'datetime',
         ];
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === self::STATUS_DRAFT;
     }
 
     public function location(): BelongsTo

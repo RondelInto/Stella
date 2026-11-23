@@ -53,6 +53,9 @@
                     <x-nav-link :href="route('inventory-transactions.index')" :active="request()->routeIs('inventory-transactions.index')" icon="clock-history">
                         {{ __('Transaction History') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('stock-counts.index')" :active="request()->routeIs('stock-counts.*')" icon="clipboard-check">
+                        {{ __('Stock Counts') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('inventory-items.index')" :active="request()->routeIs('inventory-items.*')" icon="box-seam">
                         {{ __('Items') }}
                     </x-nav-link>

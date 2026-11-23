@@ -5,6 +5,7 @@ use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryItemImportController;
 use App\Http\Controllers\InventoryTransactionController;
+use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\StockLevelController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
@@ -68,6 +69,21 @@ Route::middleware(['auth', 'can:view-inventory'])->prefix('inventory')->group(fu
 
     Route::get('/stock', [StockLevelController::class, 'index'])->name('stock-levels.index');
     Route::get('/transactions', [InventoryTransactionController::class, 'index'])->name('inventory-transactions.index');
+});
+
+// Stock counts: record at own location ('record-stock-counts'); viewing needs 'view-inventory'.
+// 'create' is registered BEFORE '{count}' so "/counts/create" isn't read as a count ID.
+Route::middleware(['auth', 'can:record-stock-counts'])->prefix('inventory')->group(function () {
+    Route::get('/counts/create', [StockCountController::class, 'create'])->name('stock-counts.create');
+    Route::post('/counts', [StockCountController::class, 'store'])->name('stock-counts.store');
+    Route::put('/counts/{count}', [StockCountController::class, 'update'])->name('stock-counts.update');
+    Route::delete('/counts/{count}', [StockCountController::class, 'destroy'])->name('stock-counts.destroy');
+});
+
+Route::middleware(['auth', 'can:view-inventory'])->prefix('inventory')->group(function () {
+    Route::get('/counts', [StockCountController::class, 'index'])->name('stock-counts.index');
+    Route::get('/counts/discrepancies', [StockCountController::class, 'discrepancies'])->name('stock-counts.discrepancies');
+    Route::get('/counts/{count}', [StockCountController::class, 'show'])->name('stock-counts.show');
 });
 
 Route::middleware(['auth', 'can:record-inventory-transactions'])->prefix('inventory')->group(function () {
