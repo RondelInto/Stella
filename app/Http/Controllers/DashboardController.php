@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use App\Models\InventoryTransaction;
 use App\Models\Location;
+use App\Models\StockTransfer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -51,6 +52,20 @@ class DashboardController extends Controller
             $stats['transactions_today'] = InventoryTransaction::whereIn('location_id', $locationIds)
                 ->whereDate('transaction_date', today())
                 ->count();
+        }
+
+        if ($user->can('view-stock-transfers')) {
+            $transfers = StockTransfer::involvingLocations($user->accessibleLocationIds());
+
+            $stats['transfers'] = [
+                'pending' => (clone $transfers)->where('status', StockTransfer::STATUS_PENDING)->count(),
+                'in_transit' => (clone $transfers)->where('status', StockTransfer::STATUS_RELEASED)->count(),
+                // For branch receivers: released transfers addressed to THEIR branch.
+                'to_receive' => $user->can('receive-stock-transfers') && $user->location_id
+                    ? StockTransfer::where('destination_location_id', $user->location_id)
+                        ->where('status', StockTransfer::STATUS_RELEASED)->count()
+                    : null,
+            ];
         }
 
         return view('dashboard', compact('stats'));

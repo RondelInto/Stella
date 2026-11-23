@@ -60,6 +60,11 @@
                         {{ __('Items') }}
                     </x-nav-link>
                 @endcan
+                @can('view-stock-transfers')
+                    <x-nav-link :href="route('stock-transfers.index')" :active="request()->routeIs('stock-transfers.*')" icon="truck">
+                        {{ __('Stock Transfers') }}
+                    </x-nav-link>
+                @endcan
                 @can('manage-inventory-items')
                     <x-nav-link :href="route('inventory-categories.index')" :active="request()->routeIs('inventory-categories.*')" icon="tags">
                         {{ __('Categories') }}

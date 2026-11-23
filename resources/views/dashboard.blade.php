@@ -49,6 +49,38 @@
         </div>
     @endisset
 
+    @isset($stats['transfers'])
+        <h3 class="h6 text-uppercase text-muted small">{{ __('Stock Transfers') }}</h3>
+        <div class="row g-3 mb-4">
+            @if ($stats['transfers']['to_receive'] !== null)
+                <div class="col-6 col-lg-3">
+                    <a href="{{ route('stock-transfers.index', ['status' => 'released']) }}" class="card border-0 shadow-sm text-decoration-none h-100">
+                        <div class="card-body">
+                            <div class="text-muted small">{{ __('To Receive at Your Branch') }}</div>
+                            <div class="fs-3 fw-semibold {{ $stats['transfers']['to_receive'] ? 'text-primary' : 'text-body' }}">{{ $stats['transfers']['to_receive'] }}</div>
+                        </div>
+                    </a>
+                </div>
+            @endif
+            <div class="col-6 col-lg-3">
+                <a href="{{ route('stock-transfers.index', ['status' => 'pending']) }}" class="card border-0 shadow-sm text-decoration-none h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ __('Pending (not yet released)') }}</div>
+                        <div class="fs-3 fw-semibold text-body">{{ $stats['transfers']['pending'] }}</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a href="{{ route('stock-transfers.index', ['status' => 'released']) }}" class="card border-0 shadow-sm text-decoration-none h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ __('In Transit') }}</div>
+                        <div class="fs-3 fw-semibold text-body">{{ $stats['transfers']['in_transit'] }}</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    @endisset
+
     @isset($stats['employees'])
         <h3 class="h6 text-uppercase text-muted small">{{ __('Administration') }}</h3>
         <div class="row g-3">

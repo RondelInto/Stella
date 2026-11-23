@@ -97,7 +97,7 @@
                             <i class="bi bi-save me-1"></i>{{ __('Save Progress') }}
                         </button>
                         <button type="submit" name="action" value="complete" class="btn btn-primary"
-                                onclick="return confirm('{{ __('Complete this count? Stock will be corrected to your counted quantities. This cannot be undone.') }}')">
+                                onclick="return confirm(@js(__('Complete this count? Stock will be corrected to your counted quantities. This cannot be undone.')))">
                             <i class="bi bi-check2-all me-1"></i>{{ __('Complete Count') }}
                         </button>
                     </div>

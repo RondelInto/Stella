@@ -7,6 +7,7 @@ use App\Http\Controllers\InventoryItemImportController;
 use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\StockLevelController;
+use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -89,6 +90,34 @@ Route::middleware(['auth', 'can:view-inventory'])->prefix('inventory')->group(fu
 Route::middleware(['auth', 'can:record-inventory-transactions'])->prefix('inventory')->group(function () {
     Route::get('/transactions/create', [InventoryTransactionController::class, 'create'])->name('inventory-transactions.create');
     Route::post('/transactions', [InventoryTransactionController::class, 'store'])->name('inventory-transactions.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Stock transfers (commissary -> branch)
+|--------------------------------------------------------------------------
+| Route middleware checks the ROLE permission; StockTransferPolicy checks location + status.
+*/
+Route::middleware(['auth', 'can:prepare-stock-transfers'])->group(function () {
+    Route::get('/transfers/create', [StockTransferController::class, 'create'])->name('stock-transfers.create');
+    Route::post('/transfers', [StockTransferController::class, 'store'])->name('stock-transfers.store');
+    Route::get('/transfers/{transfer}/edit', [StockTransferController::class, 'edit'])->name('stock-transfers.edit');
+    Route::put('/transfers/{transfer}', [StockTransferController::class, 'update'])->name('stock-transfers.update');
+    Route::post('/transfers/{transfer}/release', [StockTransferController::class, 'release'])->name('stock-transfers.release');
+});
+
+Route::middleware(['auth', 'can:receive-stock-transfers'])->group(function () {
+    Route::post('/transfers/{transfer}/receive', [StockTransferController::class, 'receive'])->name('stock-transfers.receive');
+});
+
+Route::middleware(['auth', 'can:cancel-stock-transfers'])->group(function () {
+    Route::post('/transfers/{transfer}/cancel', [StockTransferController::class, 'cancel'])->name('stock-transfers.cancel');
+});
+
+Route::middleware(['auth', 'can:view-stock-transfers'])->group(function () {
+    Route::get('/transfers', [StockTransferController::class, 'index'])->name('stock-transfers.index');
+    Route::get('/transfers/{transfer}', [StockTransferController::class, 'show'])->name('stock-transfers.show');
+    Route::get('/transfers/{transfer}/print', [StockTransferController::class, 'print'])->name('stock-transfers.print');
 });
 
 // Management (Admin): branches and commissary
