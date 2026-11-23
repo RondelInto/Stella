@@ -40,6 +40,16 @@
 
                 {{-- Phase 4 module links go here (each wrapped in @can) --}}
 
+                @can('manage-users')
+                    <div class="sidebar-heading">{{ __('Administration') }}</div>
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" icon="people">
+                        {{ __('Employees') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')" icon="person-badge">
+                        {{ __('Roles') }}
+                    </x-nav-link>
+                @endcan
+
                 <div class="sidebar-heading">{{ __('Account') }}</div>
                 <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')" icon="person">
                     {{ __('My Profile') }}

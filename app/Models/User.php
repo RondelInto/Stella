@@ -127,6 +127,36 @@ class User extends Authenticatable
         return $this->account_status === 'active';
     }
 
+    /**
+     * Set this user's active roles to exactly the given role IDs.
+     * Removed roles are kept with is_active = false (role history), not deleted.
+     *
+     * @param  array<int, int>  $roleIds
+     */
+    public function syncRoleAssignments(array $roleIds): void
+    {
+        $roleIds = array_map('intval', $roleIds);
+        $existing = $this->roles()->get()->keyBy('id');
+
+        foreach ($roleIds as $roleId) {
+            $current = $existing->get($roleId);
+
+            if (! $current) {
+                $this->roles()->attach($roleId, ['assigned_at' => now(), 'is_active' => true]);
+            } elseif (! $current->pivot->is_active) {
+                $this->roles()->updateExistingPivot($roleId, ['assigned_at' => now(), 'is_active' => true]);
+            }
+        }
+
+        foreach ($existing as $roleId => $role) {
+            if ($role->pivot->is_active && ! in_array($roleId, $roleIds, true)) {
+                $this->roles()->updateExistingPivot($roleId, ['is_active' => false]);
+            }
+        }
+
+        $this->unsetRelation('roles')->unsetRelation('activeRoles');
+    }
+
     /** Management (Admin) can see all locations. */
     public function isManagement(): bool
     {
