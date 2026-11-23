@@ -23,7 +23,7 @@
         <x-input-label for="destination_location_id" :value="__('To (Branch)')" />
         <select id="destination_location_id" name="destination_location_id"
                 class="form-select @error('destination_location_id') is-invalid @enderror" required>
-            <option value="">{{ __('â€” Select branch â€”') }}</option>
+            <option value="">{{ __('— Select branch —') }}</option>
             @foreach ($branches as $branch)
                 <option value="{{ $branch->id }}" @selected((int) old('destination_location_id', $transfer?->destination_location_id) === $branch->id)>{{ $branch->name }}</option>
             @endforeach
@@ -45,15 +45,15 @@
     <div class="row g-2 align-items-end">
         <div class="col-12 col-md-7">
             <label for="picker_item" class="form-label small mb-1">{{ __('Item (commissary stock shown in brackets)') }}</label>
-            <input type="search" id="picker_filter" class="form-control form-control-sm mb-1" placeholder="{{ __('Type to filterâ€¦') }}" autocomplete="off">
+            <input type="search" id="picker_filter" class="form-control form-control-sm mb-1" placeholder="{{ __('Type to filter…') }}" autocomplete="off">
             <select id="picker_item" class="form-select" size="5">
                 @foreach ($items as $item)
                     @php
                         $onHand = rtrim(rtrim(number_format((float) ($stock[$item->id] ?? 0), 3), '0'), '.');
                     @endphp
-                    <option value="{{ $item->id }}" data-label="{{ $item->item_code }} â€” {{ $item->name }}"
+                    <option value="{{ $item->id }}" data-label="{{ $item->item_code }} — {{ $item->name }}"
                             data-unit="{{ $item->unit_of_measure }}" data-stock="{{ $onHand }}">
-                        {{ $item->item_code }} â€” {{ $item->name }} [{{ $onHand }} {{ $item->unit_of_measure }}]
+                        {{ $item->item_code }} — {{ $item->name }} [{{ $onHand }} {{ $item->unit_of_measure }}]
                     </option>
                 @endforeach
             </select>
@@ -95,7 +95,7 @@
                 @continue(! $lineItem)
                 <tr data-item-id="{{ $lineItem->id }}">
                     <td>
-                        {{ $lineItem->item_code }} â€” {{ $lineItem->name }}
+                        {{ $lineItem->item_code }} — {{ $lineItem->name }}
                         <input type="hidden" name="lines[{{ $i }}][inventory_item_id]" value="{{ $lineItem->id }}">
                     </td>
                     <td class="text-end text-muted"><x-qty :value="$stock[$lineItem->id] ?? 0" :unit="$lineItem->unit_of_measure" /></td>
