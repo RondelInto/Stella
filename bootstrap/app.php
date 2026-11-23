@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Check on every page load that the logged-in account is still active.
+        $middleware->web(append: [
+            \App\Http\Middleware\EnsureAccountIsActive::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

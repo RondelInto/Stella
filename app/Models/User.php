@@ -50,6 +50,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'location_id' => 'integer',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
@@ -124,5 +125,56 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return $this->account_status === 'active';
+    }
+
+    /** Management (Admin) can see all locations. */
+    public function isManagement(): bool
+    {
+        return $this->hasRole(Role::ADMIN);
+    }
+
+    /**
+     * Check a permission from config/permissions.php.
+     * Prefer the Laravel way in code: $user->can('manage-users') or @can('manage-users').
+     */
+    public function hasPermission(string $permission): bool
+    {
+        if (! $this->isActive()) {
+            return false;
+        }
+
+        $allowedRoles = config("permissions.{$permission}", []);
+
+        return $this->hasRole($allowedRoles);
+    }
+
+    /**
+     * Can this user see/act on records of the given location?
+     * Management: all locations. Everyone else: only their assigned location.
+     */
+    public function canAccessLocation(Location|int|null $location): bool
+    {
+        if ($this->isManagement()) {
+            return true;
+        }
+
+        $locationId = $location instanceof Location ? $location->id : $location;
+
+        return $this->location_id !== null && $locationId !== null && $this->location_id === $locationId;
+    }
+
+    /**
+     * IDs of the locations this user may access. Use this to filter queries, e.g.
+     * InventoryStock::whereIn('location_id', $user->accessibleLocationIds())->get();
+     *
+     * @return array<int, int>
+     */
+    public function accessibleLocationIds(): array
+    {
+        if ($this->isManagement()) {
+            return Location::pluck('id')->all();
+        }
+
+        return $this->location_id ? [$this->location_id] : [];
     }
 }
