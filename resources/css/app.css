@@ -1,0 +1,95 @@
+/*
+ * Stella's Cuisine — main stylesheet
+ * Bootstrap 5 + Bootstrap Icons, plus a small set of app-specific styles.
+ * Keep custom CSS here minimal; prefer Bootstrap utility classes in views.
+ */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.min.css';
+
+:root {
+    /* Brand colors (change here to re-theme the whole app) */
+    --sc-brand: #9a3412;          /* warm brown-orange, white text passes WCAG AA */
+    --sc-brand-hover: #7c2d12;
+    --sc-sidebar-bg: #1f2937;
+    --sc-sidebar-text: #d1d5db;
+    --sc-sidebar-active: #ffffff;
+    --sc-sidebar-width: 250px;
+    --sc-body-bg: #f5f6f8;
+}
+
+body {
+    background-color: var(--sc-body-bg);
+}
+
+/* ---- Brand button and link overrides ---- */
+.btn-primary {
+    --bs-btn-bg: var(--sc-brand);
+    --bs-btn-border-color: var(--sc-brand);
+    --bs-btn-hover-bg: var(--sc-brand-hover);
+    --bs-btn-hover-border-color: var(--sc-brand-hover);
+    --bs-btn-active-bg: var(--sc-brand-hover);
+    --bs-btn-active-border-color: var(--sc-brand-hover);
+    --bs-btn-disabled-bg: var(--sc-brand);
+    --bs-btn-disabled-border-color: var(--sc-brand);
+}
+
+.text-brand { color: var(--sc-brand) !important; }
+.bg-brand { background-color: var(--sc-brand) !important; }
+
+/* ---- App shell: sidebar + main content ---- */
+/* The inner .offcanvas-lg slides in on small screens; it needs its own background there. */
+.app-sidebar .offcanvas-lg {
+    --bs-offcanvas-width: var(--sc-sidebar-width);
+    background-color: var(--sc-sidebar-bg);
+}
+
+.app-sidebar .nav-link {
+    color: var(--sc-sidebar-text);
+    border-radius: .375rem;
+    padding: .5rem .75rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.app-sidebar .nav-link:hover {
+    color: var(--sc-sidebar-active);
+    background-color: rgba(255, 255, 255, .08);
+}
+
+.app-sidebar .nav-link.active {
+    color: var(--sc-sidebar-active);
+    background-color: var(--sc-brand);
+}
+
+.app-sidebar .sidebar-heading {
+    font-size: .7rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    padding: 1rem .75rem .25rem;
+}
+
+/* On large screens the sidebar is fixed; on small screens it becomes an offcanvas menu. */
+@media (min-width: 992px) {
+    .app-sidebar {
+        width: var(--sc-sidebar-width);
+        background-color: var(--sc-sidebar-bg);
+        z-index: 1030;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+    }
+
+    .app-main {
+        margin-left: var(--sc-sidebar-width);
+    }
+}
+
+/* ---- Guest (login) pages ---- */
+.auth-card {
+    max-width: 420px;
+    width: 100%;
+}
