@@ -35,6 +35,12 @@
                             <th class="text-end">{{ __('Total Remaining') }}</th>
                         @endif
                         <th class="text-end text-nowrap">{{ __('Made :date', ['date' => $date->isToday() ? __('Today') : $date->format('M d')]) }}</th>
+                        @if ($forecastDates)
+                            <th class="text-end text-nowrap">
+                                {{ __('Expected Sales') }}
+                                <div class="small text-muted fw-normal">{{ $forecastDates[0]->format('M d') }} – {{ $forecastDates[1]->format('M d') }}</div>
+                            </th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -53,10 +59,19 @@
                                 <td class="text-end fw-semibold"><x-qty :value="$total" :unit="$unit" /></td>
                             @endif
                             <td class="text-end"><x-qty :value="$produced[$product->id] ?? 0" :unit="$unit" /></td>
+                            @if ($forecastDates)
+                                <td class="text-end text-primary">
+                                    @if ($forecast->has($product->id))
+                                        <x-qty :value="$forecast[$product->id]" :unit="$unit" />
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $locations->count() + 3 }}" class="text-center text-muted py-4">
+                            <td colspan="{{ $locations->count() + 4 }}" class="text-center text-muted py-4">
                                 {{ __('No active products linked to inventory items yet.') }}
                             </td>
                         </tr>
@@ -71,6 +86,10 @@
         @unless ($seesAllLocations)
             {{ __('You see your own branch only.') }}
         @endunless
-        {{ __('Sales forecasts will appear here once sales analysis is available.') }}
+        @if ($forecastDates)
+            {{ __('Expected Sales = total forecast for the shown locations from sales forecast run #:id (regression on imported POS sales). It is a guide, not a guarantee.', ['id' => $forecastRun->id]) }}
+        @else
+            {{ __('No current sales forecast. Management can run one under Sales Analysis.') }}
+        @endif
     </p>
 </x-app-layout>

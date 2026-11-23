@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnalysisRun;
 use App\Models\InventoryStock;
 use App\Models\Location;
 use App\Models\Product;
@@ -52,6 +53,38 @@ class ProductionPlanningController extends Controller
             ->groupBy('product_id')
             ->pluck('total', 'product_id');
 
-        return view('production.planning', compact('locations', 'products', 'stocks', 'produced', 'date', 'seesAllLocations'));
+        [$forecastRun, $forecast, $forecastDates] = $this->forecast($locations->pluck('id')->all());
+
+        return view('production.planning', compact(
+            'locations', 'products', 'stocks', 'produced', 'date', 'seesAllLocations', 'forecastRun', 'forecast', 'forecastDates'
+        ));
+    }
+
+    /**
+     * Decision AN7: expected sales from the latest saved forecast, quantities only (no pesos),
+     * for the locations this user may see, from today onward.
+     *
+     * @return array{0: ?AnalysisRun, 1: \Illuminate\Support\Collection, 2: ?array}  [run, product_id => total, [first, last] date]
+     */
+    private function forecast(array $locationIds): array
+    {
+        $run = AnalysisRun::where('analysis_type', AnalysisRun::TYPE_REGRESSION)
+            ->where('status', 'completed')
+            ->whereHas('forecasts', fn ($q) => $q->whereDate('forecast_date', '>=', today()))
+            ->latest('run_at')->latest('id')
+            ->first();
+
+        if (! $run) {
+            return [null, collect(), null];
+        }
+
+        $rows = $run->forecasts()
+            ->whereIn('location_id', $locationIds)
+            ->whereDate('forecast_date', '>=', today());
+
+        $range = (clone $rows)->selectRaw('MIN(forecast_date) as first_date, MAX(forecast_date) as last_date')->first();
+        $totals = $rows->selectRaw('product_id, SUM(predicted_quantity) as total')->groupBy('product_id')->pluck('total', 'product_id');
+
+        return [$run, $totals, $range?->first_date ? [Carbon::parse($range->first_date), Carbon::parse($range->last_date)] : null];
     }
 }

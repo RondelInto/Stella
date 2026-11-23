@@ -8,6 +8,8 @@
     <title>{{ isset($title) ? $title.' | ' : '' }}{{ config('app.name') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- Page-specific scripts, e.g. @push('scripts') @vite('resources/js/charts.js') @endpush --}}
+    @stack('scripts')
 </head>
 <body>
     {{-- Sidebar (fixed on desktop, slide-in menu on tablet/mobile) --}}

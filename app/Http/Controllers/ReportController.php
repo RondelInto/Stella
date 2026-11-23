@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnalysisRun;
 use App\Models\InventoryCategory;
 use App\Models\Location;
 use App\Services\ReportService;
@@ -132,7 +133,62 @@ class ReportController extends Controller
         return view('reports.transfers', ['rows' => $rows, 'from' => $from, 'to' => $to, 'showValues' => $showValues]);
     }
 
+    /** R6 Product Profitability, from a saved product analysis run (Management only). */
+    public function profitability(Request $request): View|StreamedResponse
+    {
+        [$run, $runs] = $this->analysisRun($request);
+        $results = $run?->results()->with('product')->get()
+            ->sortByDesc(fn ($r) => [$r->gross_profit !== null, (float) $r->gross_profit, (float) $r->total_sales])->values()
+            ?? collect();
+
+        if ($run && $request->input('export') === 'csv') {
+            return $this->csv("profitability_run-{$run->id}_{$run->period_start->toDateString()}_{$run->period_end->toDateString()}.csv",
+                ['Product', 'Group', 'Quantity Sold', 'Receipts', 'Net Sales (PHP)', 'Unit Cost (PHP)', 'Total Cost (PHP)', 'Gross Profit (PHP)', 'Margin (%)'],
+                $results->map(fn ($r) => [$r->product->pos_product_name, $r->cluster_label ?? '', $r->total_quantity_sold, $r->sales_frequency,
+                    $r->total_sales, $r->unit_cost_used ?? 'not set', $r->total_cost ?? '', $r->gross_profit ?? '',
+                    $r->profit_margin !== null ? round((float) $r->profit_margin * 100, 2) : '']));
+        }
+
+        return view('reports.profitability', compact('run', 'runs', 'results'));
+    }
+
+    /** R7 Sales Frequency, from a saved product analysis run (Management only). */
+    public function salesFrequency(Request $request): View|StreamedResponse
+    {
+        [$run, $runs] = $this->analysisRun($request);
+        $days = $run ? $run->period_start->diffInDays($run->period_end) + 1 : 1;
+        $results = $run?->results()->with('product')->get()
+            ->sortByDesc(fn ($r) => [$r->sales_frequency, (float) $r->total_quantity_sold])->values()
+            ->map(function ($r) use ($days) {
+                $r->receipts_per_day = round($r->sales_frequency / $days, 2);
+                $r->qty_per_receipt = $r->sales_frequency ? round((float) $r->total_quantity_sold / $r->sales_frequency, 2) : 0;
+
+                return $r;
+            }) ?? collect();
+
+        if ($run && $request->input('export') === 'csv') {
+            return $this->csv("sales-frequency_run-{$run->id}_{$run->period_start->toDateString()}_{$run->period_end->toDateString()}.csv",
+                ['Rank', 'Product', 'Receipts', 'Receipts per Day', 'Quantity Sold', 'Quantity per Receipt', 'Net Sales (PHP)', 'Group'],
+                $results->values()->map(fn ($r, $i) => [$i + 1, $r->product->pos_product_name, $r->sales_frequency, $r->receipts_per_day,
+                    $r->total_quantity_sold, $r->qty_per_receipt, $r->total_sales, $r->cluster_label ?? '']));
+        }
+
+        return view('reports.sales-frequency', compact('run', 'runs', 'results', 'days'));
+    }
+
     // ---------------------------------------------------------------
+
+    /** The chosen (?run=) or latest product analysis run, plus the list to choose from. */
+    private function analysisRun(Request $request): array
+    {
+        $runs = AnalysisRun::where('analysis_type', AnalysisRun::TYPE_CLUSTERING)
+            ->latest('run_at')->latest('id')->limit(50)->get();
+        $run = $request->filled('run')
+            ? $runs->firstWhere('id', $request->integer('run')) ?? AnalysisRun::where('analysis_type', AnalysisRun::TYPE_CLUSTERING)->findOrFail($request->integer('run'))
+            : $runs->first();
+
+        return [$run, $runs];
+    }
 
     /** Date range from ?from=&to= (default: this month so far). Never in the future. */
     private function period(Request $request): array

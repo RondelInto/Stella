@@ -68,3 +68,21 @@ Rules:
 - `SAMPLE_pos_sales_with_errors.csv`: rejected. Row 3 has an impossible date (Nov 31), row 4 a negative
   quantity, row 5 a comma in the price, row 6 no receipt number, row 7 no product name,
   row 8 a discount larger than the line total.
+
+## SAMPLE sales for trying Sales Analysis (module 8)
+
+The forecast needs at least 28 days of sales, so the small CSV above is not enough to see it work.
+For development and demos only, generate 60 days of **SAMPLE** sales:
+
+```
+php artisan db:seed --class=SampleSalesDataSeeder
+```
+
+- Adds 6 products named `SAMPLE …` (item codes `SMP-AN-01` to `SMP-AN-06`) with invented costs and prices.
+- Adds 60 days of invented sales (up to yesterday) for the first two active branches, shown under
+  POS Sales Imports as **"SAMPLE generated test data"**.
+- Running it again adds nothing. It refuses to run when `APP_ENV=production`.
+- These imports block real imports for the same dates and branches (overlap rule PI6). Delete them under
+  POS Sales Imports before importing real files. They can only be deleted before an analysis uses them,
+  so use a test database for demos, or reset the dev database with `php artisan migrate:fresh --seed`
+  (**this erases all data in that database**).

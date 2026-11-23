@@ -24,6 +24,12 @@
             $reports[] = ['route' => 'reports.production', 'icon' => 'fire', 'title' => __('Production'),
                 'text' => __('Quantities produced per product, ingredients used, and daily output.')];
         }
+        if (Auth::user()->can('view-all-reports') && Auth::user()->can('view-sales-analysis')) {
+            $reports[] = ['route' => 'reports.profitability', 'icon' => 'cash-coin', 'title' => __('Product Profitability'),
+                'text' => __('Net sales, cost, gross profit and margin per product, from a saved sales analysis.')];
+            $reports[] = ['route' => 'reports.sales-frequency', 'icon' => 'graph-up', 'title' => __('Sales Frequency'),
+                'text' => __('How often each product is bought (receipts), from a saved sales analysis.')];
+        }
     @endphp
 
     <div class="row g-3">
@@ -37,18 +43,5 @@
                 </a>
             </div>
         @endforeach
-
-        @can('view-all-reports')
-            @foreach ([['Product Profitability', 'cash-coin'], ['Sales Frequency', 'graph-up']] as [$title, $icon])
-                <div class="col-12 col-md-6 col-xl-4">
-                    <div class="card border-0 shadow-sm h-100 bg-light">
-                        <div class="card-body">
-                            <h2 class="h6 text-muted"><i class="bi bi-{{ $icon }} me-2"></i>{{ __($title) }}</h2>
-                            <p class="small text-muted mb-0">{{ __('Available after POS sales data is imported (modules 7–8).') }}</p>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        @endcan
     </div>
 </x-app-layout>

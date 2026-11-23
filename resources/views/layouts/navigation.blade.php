@@ -79,10 +79,17 @@
                         {{ __('Production History') }}
                     </x-nav-link>
                 @endcan
-                @can('import-pos-sales')
+                @canany(['import-pos-sales', 'view-sales-analysis'])
                     <div class="sidebar-heading">{{ __('Sales') }}</div>
+                @endcanany
+                @can('import-pos-sales')
                     <x-nav-link :href="route('sales-imports.index')" :active="request()->routeIs('sales-imports.*')" icon="file-earmark-arrow-up">
                         {{ __('POS Sales Imports') }}
+                    </x-nav-link>
+                @endcan
+                @can('view-sales-analysis')
+                    <x-nav-link :href="route('analysis.index')" :active="request()->routeIs('analysis.*')" icon="graph-up-arrow">
+                        {{ __('Sales Analysis') }}
                     </x-nav-link>
                 @endcan
                 @can('view-branch-reports')

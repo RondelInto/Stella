@@ -16,6 +16,7 @@ use App\Http\Controllers\ProductionRecordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SalesAnalysisController;
 use App\Http\Controllers\SalesImportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -189,6 +190,21 @@ Route::middleware(['auth', 'can:import-pos-sales'])->prefix('sales-imports')->na
 
 /*
 |--------------------------------------------------------------------------
+| Sales analysis and forecasting (module 8). Management only.
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'can:run-sales-analysis'])->prefix('analysis')->name('analysis.')->group(function () {
+    Route::post('/products', [SalesAnalysisController::class, 'storeProductAnalysis'])->name('products.store');
+    Route::post('/forecast', [SalesAnalysisController::class, 'storeForecast'])->name('forecast.store');
+});
+
+Route::middleware(['auth', 'can:view-sales-analysis'])->prefix('analysis')->name('analysis.')->group(function () {
+    Route::get('/', [SalesAnalysisController::class, 'index'])->name('index');
+    Route::get('/runs/{run}', [SalesAnalysisController::class, 'show'])->name('show');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Reports
 |--------------------------------------------------------------------------
 | 'view-branch-reports' = Management + Branch Managers. The controller limits Branch Managers
@@ -200,6 +216,12 @@ Route::middleware(['auth', 'can:view-branch-reports'])->prefix('reports')->name(
     Route::get('/discrepancies', [ReportController::class, 'discrepancies'])->name('discrepancies');
     Route::get('/production', [ReportController::class, 'production'])->name('production');
     Route::get('/transfers', [ReportController::class, 'transfers'])->name('transfers');
+
+    // R6–R7 come from saved sales analysis runs: Management only (decision AN7).
+    Route::middleware(['can:view-all-reports', 'can:view-sales-analysis'])->group(function () {
+        Route::get('/profitability', [ReportController::class, 'profitability'])->name('profitability');
+        Route::get('/sales-frequency', [ReportController::class, 'salesFrequency'])->name('sales-frequency');
+    });
 });
 
 // Management (Admin): branches and commissary
