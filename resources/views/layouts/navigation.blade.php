@@ -42,6 +42,17 @@
 
                 @can('view-inventory')
                     <div class="sidebar-heading">{{ __('Inventory') }}</div>
+                    <x-nav-link :href="route('stock-levels.index')" :active="request()->routeIs('stock-levels.*')" icon="bar-chart-steps">
+                        {{ __('Stock Levels') }}
+                    </x-nav-link>
+                    @can('record-inventory-transactions')
+                        <x-nav-link :href="route('inventory-transactions.create')" :active="request()->routeIs('inventory-transactions.create')" icon="plus-square">
+                            {{ __('Record Transaction') }}
+                        </x-nav-link>
+                    @endcan
+                    <x-nav-link :href="route('inventory-transactions.index')" :active="request()->routeIs('inventory-transactions.index')" icon="clock-history">
+                        {{ __('Transaction History') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('inventory-items.index')" :active="request()->routeIs('inventory-items.*')" icon="box-seam">
                         {{ __('Items') }}
                     </x-nav-link>

@@ -83,7 +83,16 @@
     </div>
 
     {{-- Movement history (audit trail for this item) --}}
-    <h3 class="h6 text-uppercase text-muted small">{{ __('Movement History') }}</h3>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="h6 text-uppercase text-muted small mb-0">{{ __('Movement History') }}</h3>
+        @can('record-inventory-transactions')
+            @if ($item->status === 'active')
+                <a href="{{ route('inventory-transactions.create', ['item' => $item->id]) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-lg me-1"></i>{{ __('Record Transaction') }}
+                </a>
+            @endif
+        @endcan
+    </div>
     <div class="card border-0 shadow-sm">
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
@@ -103,7 +112,7 @@
                         <tr>
                             <td class="text-nowrap">{{ $tx->transaction_date->format('M d, Y h:i A') }}</td>
                             <td>{{ $tx->location->name }}</td>
-                            <td>{{ str_replace('_', ' ', ucfirst($tx->transaction_type)) }}</td>
+                            <td><x-transaction-type-badge :type="$tx->transaction_type" /></td>
                             <td class="text-end"><x-qty :value="$tx->quantity" /></td>
                             <td class="text-end"><x-qty :value="$tx->balance_after" /></td>
                             <td>{{ $tx->user->name }}</td>

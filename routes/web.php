@@ -4,6 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryItemImportController;
+use App\Http\Controllers\InventoryTransactionController;
+use App\Http\Controllers\StockLevelController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -63,6 +65,14 @@ Route::middleware(['auth', 'can:manage-inventory-items'])->prefix('inventory')->
 Route::middleware(['auth', 'can:view-inventory'])->prefix('inventory')->group(function () {
     Route::get('/items', [InventoryItemController::class, 'index'])->name('inventory-items.index');
     Route::get('/items/{item}', [InventoryItemController::class, 'show'])->name('inventory-items.show');
+
+    Route::get('/stock', [StockLevelController::class, 'index'])->name('stock-levels.index');
+    Route::get('/transactions', [InventoryTransactionController::class, 'index'])->name('inventory-transactions.index');
+});
+
+Route::middleware(['auth', 'can:record-inventory-transactions'])->prefix('inventory')->group(function () {
+    Route::get('/transactions/create', [InventoryTransactionController::class, 'create'])->name('inventory-transactions.create');
+    Route::post('/transactions', [InventoryTransactionController::class, 'store'])->name('inventory-transactions.store');
 });
 
 // Management (Admin): branches and commissary

@@ -22,7 +22,35 @@
         </p>
     </div>
 
+    @isset($stats['low_stock'])
+        <h3 class="h6 text-uppercase text-muted small">{{ __('Inventory') }}</h3>
+        <div class="row g-3 mb-4">
+            @foreach ($stats['low_stock'] as $row)
+                <div class="col-6 col-lg-3">
+                    <a href="{{ route('stock-levels.index', ['location' => $row['location']->id, 'low' => 1]) }}"
+                       class="card border-0 shadow-sm text-decoration-none h-100">
+                        <div class="card-body">
+                            <div class="text-muted small text-truncate">{{ __('Low Stock') }} · {{ $row['location']->name }}</div>
+                            <div class="fs-3 fw-semibold {{ $row['count'] ? 'text-danger' : 'text-body' }}">{{ $row['count'] }}</div>
+                            <div class="small text-muted">{{ __('items at or below reorder level') }}</div>
+                        </div>
+                    </a>
+                </div>
+            @endforeach
+            <div class="col-6 col-lg-3">
+                <a href="{{ route('inventory-transactions.index', ['from' => today()->toDateString(), 'to' => today()->toDateString()]) }}"
+                   class="card border-0 shadow-sm text-decoration-none h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ __('Stock Movements Today') }}</div>
+                        <div class="fs-3 fw-semibold text-body">{{ $stats['transactions_today'] }}</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    @endisset
+
     @isset($stats['employees'])
+        <h3 class="h6 text-uppercase text-muted small">{{ __('Administration') }}</h3>
         <div class="row g-3">
             <div class="col-6 col-lg-3">
                 <a href="{{ route('users.index', ['status' => 'active']) }}" class="card border-0 shadow-sm text-decoration-none h-100">
@@ -57,11 +85,13 @@
                 </div>
             </div>
         </div>
-    @else
+    @endisset
+
+    @if (empty($stats))
         <div class="card border-0 shadow-sm">
             <div class="card-body text-muted">
                 {{ __('Your modules will appear in the menu as they are added to the system.') }}
             </div>
         </div>
-    @endisset
+    @endif
 </x-app-layout>
