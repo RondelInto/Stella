@@ -51,7 +51,13 @@ class UserRequest extends FormRequest
             'contact_no' => ['nullable', 'string', 'max:30'],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => ['integer', Rule::exists('roles', 'id')],
-            'location_id' => ['nullable', 'integer', Rule::exists('locations', 'id')],
+            // Must be an active location (or the user's current one, if unchanged).
+            'location_id' => [
+                'nullable', 'integer',
+                Rule::exists('locations', 'id')->where(fn ($q) => $q
+                    ->where('status', 'active')
+                    ->orWhere('id', $editing?->location_id)),
+            ],
             // Password is required only when creating a new account.
             'password' => [$editing ? 'nullable' : 'required', 'confirmed', Password::defaults()],
         ];

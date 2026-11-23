@@ -75,7 +75,7 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        return view('users.edit', ['user' => $user->load(['activeRoles', 'location'])] + $this->formOptions());
+        return view('users.edit', ['user' => $user->load(['activeRoles', 'location'])] + $this->formOptions($user));
     }
 
     public function update(UserRequest $request, User $user): RedirectResponse
@@ -157,12 +157,20 @@ class UserController extends Controller
             ->exists();
     }
 
-    /** Dropdown/checkbox data shared by the create and edit forms. */
-    private function formOptions(): array
+    /**
+     * Dropdown/checkbox data shared by the create and edit forms.
+     * Only active locations are offered, plus the user's current location (even if inactive)
+     * so editing an old account doesn't silently clear it.
+     */
+    private function formOptions(?User $user = null): array
     {
         return [
             'roles' => Role::orderBy('id')->get(),
-            'locations' => Location::active()->orderBy('type')->orderBy('name')->get(),
+            'locations' => Location::query()
+                ->where(fn ($q) => $q->where('status', 'active')->orWhere('id', $user?->location_id))
+                ->orderBy('type')
+                ->orderBy('name')
+                ->get(),
         ];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -31,6 +32,12 @@ Route::middleware(['auth', 'can:manage-users'])->group(function () {
     Route::put('/users/{user}/password', [UserController::class, 'resetPassword'])->name('users.password');
 
     Route::resource('roles', RoleController::class)->only(['index', 'edit', 'update']);
+});
+
+// Management (Admin): branches and commissary
+Route::middleware(['auth', 'can:manage-locations'])->group(function () {
+    Route::resource('locations', LocationController::class)->except(['show', 'destroy']);
+    Route::patch('/locations/{location}/status', [LocationController::class, 'updateStatus'])->name('locations.status');
 });
 
 require __DIR__.'/auth.php';

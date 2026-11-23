@@ -49,6 +49,11 @@
                         {{ __('Roles') }}
                     </x-nav-link>
                 @endcan
+                @can('manage-locations')
+                    <x-nav-link :href="route('locations.index')" :active="request()->routeIs('locations.*')" icon="geo-alt">
+                        {{ __('Locations') }}
+                    </x-nav-link>
+                @endcan
 
                 <div class="sidebar-heading">{{ __('Account') }}</div>
                 <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')" icon="person">
